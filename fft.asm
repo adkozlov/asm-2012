@@ -13,14 +13,15 @@ calloc_int_size:
 calloc_double_2size:
 	push 8 ; sizeof(double)
 	push dword [ebp + 12] ; size
-	shl [esp], 1
+	shl dword [esp], 1
 	call _calloc
 	add esp, 8
 	ret
 	
 free:
-	pop eax
-	push dword [ebp - eax]
+	mov eax, ebp
+	sub eax, [esp + 4]
+	push eax
 	call _free
 	add esp, 4
 	ret
@@ -57,7 +58,6 @@ fft:
 		fld st0
 		fimul dword [ebp - 8]
 		fsincos
-		mov [ebp + ]
 		
 		cmp dword [ebp - 8], 0
 		jnz roots_loop
@@ -75,6 +75,7 @@ fft:
 	; free(roots)
 	push 4
 	call free
+	add esp, 4
 	
 	; return cur;
 	mov eax, [ebp - 12]
