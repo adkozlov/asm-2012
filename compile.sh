@@ -1,3 +1,3 @@
 #!/bin/bash
 
-yasm fft.asm -o fft.o -f elf32
+yasm fft.asm -f elf32

@@ -1,4 +1,6 @@
 ; http://pastebin.com/uGr4VT3b
+extern _calloc
+
 section .text
 
 global fft
@@ -16,7 +18,7 @@ fft:
 	push 8 ; sizeof(double)
 	push dword [ebp + 12]
 	shl [esp], 1
-	call calloc
+	call _calloc
 	add esp, 8
 	mov [ebp - 4], eax
 	
@@ -36,7 +38,7 @@ fft:
 		fld st0
 		fimul dword [ebp - 8]
 		fsincos
-		mov [ebp +
+		mov [ebp + ]
 		
 		cmp dword [ebp - 8], 0
 		jnz roots_loop
