@@ -3,7 +3,7 @@ section .text
 
 global fft
 
-; double* fft(const double* in_data, const int size)
+; double* fft(const double *in_data, const int size)
 fft:
 	push ebp
 	mov ebp, esp
@@ -18,7 +18,7 @@ fft:
 	shl [esp], 1
 	call calloc
 	add esp, 8
-	mov [ebp - 8], eax
+	mov [ebp - 4], eax
 	
 	; double alpha = 2 * M_PI / size
 	fldpi
@@ -29,14 +29,16 @@ fft:
 	
 	; for (i = 0; i < size; ++i)
 	mov ecx, [ebp + 12]
+	mov [ebp - 8], ecx
 	roots_loop:
-		dec	ecx
+		dec	dword [ebp - 8]
 		
-		fimul dword ecx
 		fld st0
+		fimul dword [ebp - 8]
 		fsincos
+		mov [ebp +
 		
-		test ecx, ecx
+		cmp dword [ebp - 8], 0
 		jnz roots_loop
 		
 	
