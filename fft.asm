@@ -1,7 +1,21 @@
-; http://pastebin.com/uGr4VT3b
 extern _calloc
+extern _free
 
 section .text
+
+new_int_size:
+	push 4 ; sizeof(int)
+	push dword [ebp + 12]
+	call _calloc
+	add esp, 8
+
+new_double_2size:
+	push 8 ; sizeof(double)
+	push dword [ebp + 12]
+	shl [esp], 1
+	call _calloc
+	add esp, 8
+	
 
 global fft
 
@@ -15,11 +29,7 @@ fft:
 	push edi
 	
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
-	push 8 ; sizeof(double)
-	push dword [ebp + 12]
-	shl [esp], 1
-	call _calloc
-	add esp, 8
+	jmp new_double_2size
 	mov [ebp - 4], eax
 	
 	; double alpha = 2 * M_PI / size
