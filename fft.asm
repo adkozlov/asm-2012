@@ -66,12 +66,6 @@ fft:
 	call calloc_double_2size
 	mov [ebp - 12], eax
 	
-	pop edi
-	pop esi
-	pop ebx
-	mov esp, ebp
-	pop ebp
-	
 	; free(roots)
 	push 4
 	call free
@@ -79,6 +73,12 @@ fft:
 	
 	; return cur;
 	mov eax, [ebp - 12]
+	
+	pop edi
+	pop esi
+	pop ebx
+	mov esp, ebp
+	pop ebp
 	ret
 		
 end
