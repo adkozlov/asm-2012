@@ -18,6 +18,13 @@ calloc_double_2size:
 	add esp, 8
 	ret
 	
+free:
+	pop eax
+	push dword [ebp - eax]
+	call _free
+	add esp, 4
+	ret
+	
 
 global fft
 
@@ -65,7 +72,12 @@ fft:
 	mov esp, ebp
 	pop ebp
 	
+	; free(roots)
+	push 4
+	call free
+	
 	; return cur;
-	ret [ebp - 12] 
+	mov eax, [ebp - 12]
+	ret
 		
 end
