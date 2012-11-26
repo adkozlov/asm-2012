@@ -1,7 +1,4 @@
-section .const
-
-pi dq 3.14159265
-
+; http://pastebin.com/uGr4VT3b
 section .text
 
 ; parameters
@@ -12,35 +9,40 @@ global fft
 
 ; double* fft(const double* in_data, const int size)
 fft:
-	push ebx ; save regs
+	push ebp
+	mov ebp, esp
+	sub esp, 20 ; todo: local vars
+	push ebx
 	push esi
 	push edi
 	
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
-	roots dq 2 * size dup (0)
+	push 8 ; sizeof(double)
+	push dword [ebp + 12]
+	shl [esp], 1
+	call calloc
+	add esp, 8 ; pointer in eax
 	
 	; double alpha = 2 * M_PI / size
-	movsd xmm0, pi
-	mulsd xmm0, 2
-	divsd xmm0, size
+	fldpi
+	fmul 2
+	fdiv size	
 	
 	; for (i = 0; i < size; ++i)
-	xor ecx, ecx 
-	roots_1:
-		cmp ecx, size
-		jae roots_2
-			
+	mov ecx, size 
+	roots_loop:		
 		movsd xmm1, ecx
+		mulsd xmm1, xmm0
 		
 		inc ecx
-		jmp roots_1
+		jnz roots_loop
+		
 	
-	roots_2:	
 	
-	
-	pop edi ;save regs
+	pop edi
 	pop esi
 	pop ebx
-	ret
-	
+	mov esp, ebp
+	pop ebp
+	ret	
 end
