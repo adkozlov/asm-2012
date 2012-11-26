@@ -2,8 +2,8 @@
 section .text
 
 ; parameters
-%define in_data dword [ebp + 8]
-%define size dword [ebp + 12]
+in_data dword [ebp + 8]
+size dword [ebp + 12]
 
 global fft
 
@@ -25,14 +25,18 @@ fft:
 	
 	; double alpha = 2 * M_PI / size
 	fldpi
-	fmul 2
-	fdiv size	
+	push 2
+	fimul dword [esp]
+	add esp, 4
+	fidiv dword [ebp + 12]
+	
+	fld st0
+	fsincos
 	
 	; for (i = 0; i < size; ++i)
 	mov ecx, size 
 	roots_loop:		
-		movsd xmm1, ecx
-		mulsd xmm1, xmm0
+		
 		
 		inc ecx
 		jnz roots_loop

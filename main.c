@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-double *fft(const double* in_data, const int size)
+double *fft(const double* in_data, const int size);
+/*double *fft(const double* in_data, const int size)
 {
 	int i;
 	
@@ -76,7 +77,7 @@ double *fft(const double* in_data, const int size)
 	free(roots);
 	
 	return cur;
-}
+}*/
 
 int main(int argc, char* argv[])
 {
