@@ -1,10 +1,6 @@
 ; http://pastebin.com/uGr4VT3b
 section .text
 
-; parameters
-in_data dword [ebp + 8]
-size dword [ebp + 12]
-
 global fft
 
 ; double* fft(const double* in_data, const int size)
@@ -21,24 +17,26 @@ fft:
 	push dword [ebp + 12]
 	shl [esp], 1
 	call calloc
-	add esp, 8 ; pointer in eax
+	add esp, 8
+	mov [ebp - 8], eax
 	
 	; double alpha = 2 * M_PI / size
 	fldpi
 	push 2
 	fimul dword [esp]
 	add esp, 4
-	fidiv dword [ebp + 12]
-	
-	fld st0
-	fsincos
+	fidiv dword [ebp + 12]	
 	
 	; for (i = 0; i < size; ++i)
-	mov ecx, size 
-	roots_loop:		
+	mov ecx, [ebp + 12]
+	roots_loop:
+		dec	ecx
 		
+		fimul dword ecx
+		fld st0
+		fsincos
 		
-		inc ecx
+		test ecx, ecx
 		jnz roots_loop
 		
 	
