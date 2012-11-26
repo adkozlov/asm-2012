@@ -1,13 +1,8 @@
 #!/bin/bash
 
-yasm ./src/fft.asm -o ./bin/fft.o -f elf32
-echo "asm compiling success"
-
+yasm ./src/fft.asm -f elf32 -o ./bin/fft.o
 gcc -c ./src/main.c -o ./bin/main.o
-echo "c compiling success"
 
-ld -o ./bin/fft --dynamic-linker /lib/ld-linux.so.2 -melf_i386 -lc ./bin/main.o ./bin/fft.o
-echo "linking success"
+ld --dynamic-linker /lib/ld-linux.so.2 -melf_i386 -lc -o ./bin/fft ./bin/main.o ./bin/fft.o
 
 ./bin/fft
-echo "run sucess"
