@@ -24,23 +24,55 @@ global fft
 fft:
 	push ebp
 	mov ebp, esp
-	sub esp, 20 ; todo: local vars
+	sub esp, 32 ; todo: local vars
 	push ebx
 	push esi
-	push edi
+	push edi	
 	
-	; while ((1 << k) < size)
-	mov dword [ebp - 16], -1
-	log_loop:
-		inc dword [ebp - 16]
+	mov ebx, -1 ; int k = 0
+	log_loop: ; while ((1 << k) < size)
+		inc dword ebx
 		
+		; (1 << k) < size
 		xor eax, eax
 		inc eax
-		mov ecx, [ebp - 16]
-		shl eax, cl
+		shl eax, bl
 		cmp eax, [ebp + 12]
-		
+
 		jb log_loop
+
+	; int *rev = (int*) calloc(size, sizeof(int))
+	call calloc_int_size
+	mov [ebp - 20], eax
+	
+	mov dword [ebp - 20], 0 ; rev[0] = 0
+	mov edx, -1 ; int high1 = -1
+	
+	xor ecx, ecx
+	rev_loop: ; for (i = 1; i < size; ++i)
+		inc ecx
+		
+		
+		; i ^ (1 << high1)
+		xor eax, eax
+		inc eax
+		mov ecx, edx
+		shl eax, cl
+		xor eax, ecx
+		
+		; (1 << (k - high1 - 1))
+		mov eax, ebx
+		sub eax, edx
+		dec eax
+		push eax
+		xor eax, eax
+		inc eax
+		shl eax, [esp]
+		add esp, 4
+		
+		mov ecx, [ebp + 12]
+		cmp dword [ebp - 8], ecx
+		jnz rev_loop
 
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
 	call calloc_double_2size
@@ -69,6 +101,11 @@ fft:
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
 	mov [ebp - 12], eax
+	
+	; free(rev)
+	push dword [ebp - 20]
+	call free
+	add esp, 4
 
 	; free(roots)
 	push dword [ebp - 4]
