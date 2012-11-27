@@ -29,50 +29,53 @@ fft:
 	push esi
 	push edi	
 	
-	mov ebx, -1 ; int k = 0
+	xor ecx, ecx ; int k = 0
 	log_loop: ; while ((1 << k) < size)
-		inc dword ebx
-		
 		; (1 << k) < size
 		xor eax, eax
 		inc eax
-		shl eax, bl
+		shl eax, cl
+		inc ecx
 		cmp eax, [ebp + 12]
-
 		jb log_loop
+	mov dword [ebp - 16], ecx
 
 	; int *rev = (int*) calloc(size, sizeof(int))
 	call calloc_int_size
 	mov [ebp - 20], eax
 	
 	mov dword [ebp - 20], 0 ; rev[0] = 0
-	mov edx, -1 ; int high1 = -1
+	mov dword [ebp - 24], -1 ; int high1 = -1
 	
 	xor ecx, ecx
 	rev_loop: ; for (i = 1; i < size; ++i)
 		inc ecx
 		
+		; i & (i - 1) == 0
+		push ecx
+		mov eax, ecx
+		dec eax
+		and eax, [esp]
+		add esp, 4
 		
 		; i ^ (1 << high1)
 		xor eax, eax
 		inc eax
-		mov ecx, edx
-		shl eax, cl
+		mov edx, dword [ebp - 24]
+		shl eax, dl
 		xor eax, ecx
 		
-		; (1 << (k - high1 - 1))
-		mov eax, ebx
-		sub eax, edx
-		dec eax
-		push eax
+		; 1 << (k - high1 - 1)
+		mov edx, dword [ebp - 16]
+		sub edx, dword [ebp - 24]
+		dec edx
 		xor eax, eax
 		inc eax
-		shl eax, [esp]
+		shl eax, dl
 		add esp, 4
 		
-		mov ecx, [ebp + 12]
-		cmp dword [ebp - 8], ecx
-		jnz rev_loop
+		cmp ecx, [ebp + 12]
+		jb rev_loop
 
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
 	call calloc_double_2size
