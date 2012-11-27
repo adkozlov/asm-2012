@@ -3,14 +3,14 @@ extern free
 
 section .text
 
-calloc_int_size:
+calloc_int_size_:
 	push 4 ; sizeof(int)
 	push dword [ebp + 12] ; size
 	call calloc
 	add esp, 8
 	ret
 
-calloc_double_2size:
+calloc_double_2size_:
 	push 8 ; sizeof(double)
 	push dword [ebp + 12] ; size
 	shl dword [esp], 1
@@ -39,7 +39,7 @@ fft:
 	push edi
 
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
-	call calloc_double_2size
+	call calloc_double_2size_
 	mov [ebp - 4], eax
 
 	; double alpha = 2 * M_PI / size
@@ -63,7 +63,7 @@ fft:
 		jnz roots_loop
 
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
-	call calloc_double_2size
+	call calloc_double_2size_
 	mov [ebp - 12], eax
 
 	; free(roots)

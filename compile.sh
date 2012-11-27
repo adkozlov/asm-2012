@@ -1,9 +1,7 @@
 #!/bin/bash
 
 yasm ./src/fft.asm -f elf32 -o ./bin/fft.o
-gcc -c ./src/main.c -o ./bin/main.o
+gcc -c ./src/main.c -o ./bin/main.o -m32
 
-#ld --dynamic-linker /lib/ld-linux.so.2 -melf_i386 -lc -o ./bin/fft ./bin/main.o ./bin/fft.o
-gcc -o ./bin/main.c ./bin/fft.o -m32
-
+gcc ./bin/main.o ./bin/fft.o -m32 -o ./bin/fft
 ./bin/fft
