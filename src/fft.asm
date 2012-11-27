@@ -3,29 +3,20 @@ extern free
 
 section .text
 
-calloc_int_size_:
+calloc_int_size:
 	push 4 ; sizeof(int)
 	push dword [ebp + 12] ; size
 	call calloc
 	add esp, 8
 	ret
 
-calloc_double_2size_:
+calloc_double_2size:
 	push 8 ; sizeof(double)
 	push dword [ebp + 12] ; size
 	shl dword [esp], 1
 	call calloc
 	add esp, 8
 	ret
-
-free_:
-	mov eax, ebp
-	sub eax, [esp + 4]
-	push eax
-	call free
-	add esp, 4
-	ret
-
 
 global fft
 
@@ -39,8 +30,7 @@ fft:
 	push edi
 	
 	; while ((1 << k) < size)
-	mov ecx, -1
-	mov [ebp - 16], ecx
+	mov dword [ebp - 16], -1
 	log_loop:
 		inc dword [ebp - 16]
 		
@@ -53,7 +43,7 @@ fft:
 		jb log_loop
 
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
-	call calloc_double_2size_
+	call calloc_double_2size
 	mov [ebp - 4], eax
 
 	; double alpha = 2 * M_PI / size
@@ -77,7 +67,7 @@ fft:
 		jnz roots_loop
 
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
-	call calloc_double_2size_
+	call calloc_double_2size
 	mov [ebp - 12], eax
 
 	; free(roots)
