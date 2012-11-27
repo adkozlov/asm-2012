@@ -39,13 +39,15 @@ fft:
 	push edi
 	
 	; while ((1 << k) < size)
-	mov [ebp - 16], -1
+	mov ecx, -1
+	mov [ebp - 16], ecx
 	log_loop:
 		inc dword [ebp - 16]
 		
 		xor eax, eax
 		inc eax
-		shl eax, [ebp - 16]
+		mov ecx, [ebp - 16]
+		shl eax, cl
 		cmp eax, [ebp + 12]
 		
 		jb log_loop
