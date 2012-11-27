@@ -37,6 +37,18 @@ fft:
 	push ebx
 	push esi
 	push edi
+	
+	; while ((1 << k) < size)
+	mov [ebp - 16], -1
+	log_loop:
+		inc dword [ebp - 16]
+		
+		xor eax, eax
+		inc eax
+		shl eax, [ebp - 16]
+		cmp eax, [ebp + 12]
+		
+		jb log_loop
 
 	; double *roots = (double*) calloc(2 * size, sizeof(double))
 	call calloc_double_2size_
@@ -67,8 +79,8 @@ fft:
 	mov [ebp - 12], eax
 
 	; free(roots)
-	push 4
-	call free_
+	push dword [ebp - 4]
+	call free
 	add esp, 4
 
 	; return cur;
