@@ -62,7 +62,10 @@ fft:
 		xor eax, eax
 		inc eax
 		mov edx, dword [ebp - 24]
-		shl eax, dl
+		push ecx
+		mov ecx, edx
+		shl eax, cl
+		pop ecx
 		xor eax, ecx
 		
 		; 1 << (k - high1 - 1)
@@ -71,7 +74,10 @@ fft:
 		dec edx
 		xor eax, eax
 		inc eax
-		shl eax, dl
+		push ecx
+		mov ecx, edx
+		shl eax, cl
+		pop ecx
 		add esp, 4
 		
 		cmp ecx, [ebp + 12]
