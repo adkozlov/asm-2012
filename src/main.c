@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-double *fft(const double *in_data, const int size);
+extern double *fft(const double *in_data, const int size);
 /*double *fft(const double *in_data, const int size)
 {
 	int i;

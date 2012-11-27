@@ -1,12 +1,12 @@
-extern _calloc
-extern _free
+extern calloc
+extern free
 
 section .text
 
 calloc_int_size:
 	push 4 ; sizeof(int)
 	push dword [ebp + 12] ; size
-	call _calloc
+	call calloc
 	add esp, 8
 	ret
 
@@ -14,15 +14,15 @@ calloc_double_2size:
 	push 8 ; sizeof(double)
 	push dword [ebp + 12] ; size
 	shl dword [esp], 1
-	call _calloc
+	call calloc
 	add esp, 8
 	ret
 
-free:
+free_:
 	mov eax, ebp
 	sub eax, [esp + 4]
 	push eax
-	call _free
+	call free
 	add esp, 4
 	ret
 
@@ -68,7 +68,7 @@ fft:
 
 	; free(roots)
 	push 4
-	call free
+	call free_
 	add esp, 4
 
 	; return cur;
