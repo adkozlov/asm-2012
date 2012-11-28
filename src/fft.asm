@@ -38,7 +38,7 @@ fft:
 		inc ecx
 		cmp eax, [ebp + 12]
 		jb log_loop
-	mov dword [ebp - 4], ecx
+	mov dword [ebp - 4], ecx	
 
 	; int *rev = (int*) calloc(size, sizeof(int))
 	call calloc_int_size
@@ -58,9 +58,7 @@ fft:
 		test eax, ecx
 		jnz .false
 			inc dword [ebp - 16]
-			jmp .endif
 		.false:
-		.endif:
 		
 		; i ^ (1 << high1)
 		xor eax, eax
@@ -71,8 +69,11 @@ fft:
 		shl eax, cl
 		pop ecx
 		xor eax, ecx
-		
-		push dword [ebp + 4 * eax - 8]
+				
+		mov edx, [ebp - 8]
+		lea ebx, [2 * ecx]
+		lea ebx, [edx + 4 * ebx]
+		mov [ebx], eax
 		
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 4]
@@ -86,11 +87,7 @@ fft:
 		pop ecx
 		add esp, 4
 		
-		or eax, [esp]
-		add esp, 4
-		mov edx, [ebp - 12]
-		mov [edx + 4 * ecx] , eax
-		
+		or [ebx], eax
 		cmp ecx, [ebp + 12]
 		jb rev_loop
 
@@ -129,7 +126,7 @@ fft:
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
 	mov [ebp - 24], eax
-	
+
 	; free(rev)
 	push dword [ebp - 8]
 	call free
@@ -149,5 +146,3 @@ fft:
 	mov esp, ebp
 	pop ebp
 	ret
-
-end
