@@ -35,14 +35,17 @@ fft:
 	push edi	
 	
 	xor ecx, ecx ; int k = 0
+	dec ecx
 	log_loop: ; while ((1 << k) < size)
+		inc ecx
+	
 		; (1 << k) < size
 		xor eax, eax
 		inc eax
 		shl eax, cl
-		inc ecx
+		
 		cmp eax, [ebp + 12]
-		jb log_loop		
+		jb log_loop				
 	mov dword [ebp - 4], ecx		
 
 	; int *rev = (int*) calloc(size, sizeof(int))
@@ -50,13 +53,12 @@ fft:
 	mov [ebp - 8], eax
 	
 	mov edx, [ebp - 8]
-	mov dword [edx], 0 ; rev[0] = 0
+	mov dword [edx], 0 ; rev[0] = 0	
 	mov dword [ebp - 16], -1 ; int high1 = -1
 	
 	xor ecx, ecx
-	rev_loop: ; for (i = 1; i < size; ++i)
-		inc ecx
-		
+	inc ecx
+	rev_loop: ; for (i = 1; i < size; ++i)		
 		; if (i & (i - 1) == 0)
 		mov eax, ecx
 		dec eax
@@ -67,10 +69,9 @@ fft:
 		
 		; i ^ (1 << high1)
 		xor eax, eax
-		inc eax
-		mov edx, dword [ebp - 16]
+		inc eax 
 		push ecx
-		mov ecx, edx
+		mov ecx, dword [ebp - 16]
 		shl eax, cl
 		pop ecx
 		xor eax, ecx
@@ -89,12 +90,25 @@ fft:
 		push ecx
 		mov ecx, edx
 		shl eax, cl
-		pop ecx
-		add esp, 4
+		pop ecx		
 		
 		or [ebx], eax
-		dec dword [ebx]
 		
+		push ecx
+		push eax
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
+		
+		push ecx
+		push dword [ebx]
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
+		
+		inc ecx
 		cmp ecx, [ebp + 12]
 		jb rev_loop
 
@@ -144,27 +158,39 @@ fft:
 		mov ebx, [ebx + 4 * ecx]
 		shl ebx, 1
 		
+		lea eax, [2 * ecx]
+
 		mov edx, [ebp + 8]
-		mov esi, [edx + 8 * ebx] ; in_data[2 * ni]
-		mov edi, [edx + 8 * ebx + 8] ; in_data[2 * ni + 1]
-		
+		mov esi, [edx + 8 * ebx]
+		mov edi, [edx + 8 * ebx + 4]
 		mov edx, [ebp - 24]
-		lea ebx, [2 * ecx]
-		mov [edx + 8 * ebx], esi ; cur[2 * i]
-		mov [edx + 8 * ebx + 8], edi ; cur[2 * i + 1]
-						
+		mov [edx + 8 * eax], esi
+		mov [edx + 8 * eax + 4], edi
+		
 		push ecx
-		push esi
-		push format_int
+		push dword [edx + 8 * eax + 4]
+		push dword [edx + 8 * eax]
+		push format_double
 		call printf
-		add esp, 8
+		add esp, 12
 		pop ecx
+
+		inc ebx
+
+		mov edx, [ebp + 8]
+		mov esi, [edx + 8 * ebx]
+		mov edi, [edx + 8 * ebx + 4]
+		mov edx, [ebp - 24]
+		mov [edx + 8 * eax], esi
+		mov [edx + 8 * eax + 4], edi
+		
 		push ecx
-		push edi
-		push format_int
+		push dword [edx + 8 * ebx + 4]
+		push dword [edx + 8 * ebx]
+		push format_double
 		call printf
-		add esp, 8
-		pop ecx
+		add esp, 12
+		pop ecx						
 		
 		cmp ecx, 0
 		jnz cur_loop
