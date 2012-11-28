@@ -52,7 +52,7 @@ fft:
 	rev_loop: ; for (i = 1; i < size; ++i)
 		inc ecx
 		
-		; if (i & (i - 1) == 0)		
+		; if (i & (i - 1) == 0)
 		mov eax, ecx
 		dec eax
 		test eax, ecx
@@ -132,15 +132,19 @@ fft:
 	cur_loop:
 		dec ecx
 		
-		mov ebx, [ebp + 4 * ecx - 8]
+		; int ni = rev[i]
+		mov ebx, [ebp - 8]
+		mov ebx, [ebx + 4 * ecx]
 		shl ebx, 1
 		
-		mov edx, [ebp - 8]
-		mov eax, ecx
-		shl eax, 1
-		mov qword [edx + 8 * eax], 
-		inc eax
-		mov qword [edx + 8 * eax], 
+		mov edx, [ebp + 8]
+		mov esi, [edx + 8 * ebx] ; in_data[2 * ni]
+		mov edi, [edx + 8 * ebx + 8] ; in_data[2 * ni + 1]
+		
+		mov edx, [ebp - 24]
+		lea ebx, [2 * ecx]
+		mov [edx + 8 * ebx], esi ; cur[2 * i]
+		mov [edx + 8 * ebx + 8], edi ; cur[2 * i + 1]
 		
 		cmp ecx, 0
 		jnz cur_loop

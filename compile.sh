@@ -5,3 +5,5 @@ gcc -c ./src/main.c -o ./bin/main.o -m32 -g
 
 gcc ./bin/main.o ./bin/fft.o -m32 -o fft
 ./fft
+
+cat fft.out
