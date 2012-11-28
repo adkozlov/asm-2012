@@ -51,12 +51,15 @@ fft:
 	rev_loop: ; for (i = 1; i < size; ++i)
 		inc ecx
 		
-		; i & (i - 1) == 0
-		push ecx
+		; if (i & (i - 1) == 0)		
 		mov eax, ecx
 		dec eax
-		and eax, [esp]
-		add esp, 4
+		test eax, ecx
+		jnz .false
+			inc dword [ebp - 24]
+			jmp .endif
+		.false:
+		.endif:
 		
 		; i ^ (1 << high1)
 		xor eax, eax
