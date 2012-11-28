@@ -68,6 +68,8 @@ fft:
 		pop ecx
 		xor eax, ecx
 		
+		push [ebp + 4 * eax - 20]
+		
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 16]
 		sub edx, dword [ebp - 24]
@@ -79,6 +81,10 @@ fft:
 		shl eax, cl
 		pop ecx
 		add esp, 4
+		
+		or eax, esp
+		add esp, 4
+		mov [esp + 4 * ecx - 20] , eax
 		
 		cmp ecx, [ebp + 12]
 		jb rev_loop
