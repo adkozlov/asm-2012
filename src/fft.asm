@@ -44,7 +44,8 @@ fft:
 	call calloc_int_size
 	mov [ebp - 8], eax
 	
-	mov dword [ebp - 12], 0 ; rev[0] = 0
+	mov eax, [ebp - 8]
+	mov dword [eax], 0 ; rev[0] = 0
 	mov dword [ebp - 16], -1 ; int high1 = -1
 	
 	xor ecx, ecx
@@ -85,9 +86,10 @@ fft:
 		pop ecx
 		add esp, 4
 		
-		or eax, esp
+		or eax, [esp]
 		add esp, 4
-		mov [esp + 4 * ecx - 12] , eax
+		mov edx, [ebp - 12]
+		mov [edx + 4 * ecx] , eax
 		
 		cmp ecx, [ebp + 12]
 		jb rev_loop
@@ -116,9 +118,10 @@ fft:
 		
 		mov eax, ecx
 		shl eax, 1
-		fstp qword [ebp + 8 * eax - 20]
+		mov edx, [ebp - 20]
+		fstp qword [edx + 8 * eax]
 		inc eax
-		fstp qword [ebp + 8 * eax - 20]
+		fstp qword [edx + 8 * eax]
 
 		cmp ecx, 0
 		jnz roots_loop
