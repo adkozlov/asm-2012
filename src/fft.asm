@@ -44,8 +44,8 @@ fft:
 	call calloc_int_size
 	mov [ebp - 8], eax
 	
-	mov eax, [ebp - 8]
-	mov dword [eax], 0 ; rev[0] = 0
+	mov edx, [ebp - 8]
+	mov dword [edx], 0 ; rev[0] = 0
 	mov dword [ebp - 16], -1 ; int high1 = -1
 	
 	xor ecx, ecx
@@ -126,11 +126,46 @@ fft:
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
 	mov [ebp - 24], eax
+	
+	; for (i = 0; i < size; ++i)
+	mov ecx, [ebp + 12]
+	cur_loop:
+		dec ecx
+		
+		mov ebx, [ebp + 4 * ecx - 8]
+		shl ebx, 1
+		
+		mov edx, [ebp - 8]
+		mov eax, ecx
+		shl eax, 1
+		mov qword [edx + 8 * eax], 
+		inc eax
+		mov qword [edx + 8 * eax], 
+		
+		cmp ecx, 0
+		jnz cur_loop
 
 	; free(rev)
 	push dword [ebp - 8]
 	call free
 	add esp, 4
+	
+	; for (len = 1; len < size; len <<= 1)
+	xor ecx, ecx
+	inc ecx
+	len_loop:
+		; double *ncur = (double*) calloc(2 * size, sizeof(double))
+		call calloc_double_2size
+		mov [ebp - 28], eax
+		
+		; free(ncur)
+		push dword [ebp - 28]
+		call free
+		add esp, 4
+		
+		shl ecx, 1
+		cmp ecx, [ebp + 12]
+		jb len_loop
 
 	; free(roots)
 	push dword [ebp - 20]
