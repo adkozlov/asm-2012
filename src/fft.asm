@@ -42,8 +42,8 @@ fft:
 		shl eax, cl
 		inc ecx
 		cmp eax, [ebp + 12]
-		jb log_loop
-	mov dword [ebp - 4], ecx	
+		jb log_loop		
+	mov dword [ebp - 4], ecx		
 
 	; int *rev = (int*) calloc(size, sizeof(int))
 	call calloc_int_size
@@ -93,11 +93,7 @@ fft:
 		add esp, 4
 		
 		or [ebx], eax
-		
-		push ecx
-		push format_int
-		call printf
-		add esp, 8
+		dec dword [ebx]
 		
 		cmp ecx, [ebp + 12]
 		jb rev_loop
@@ -156,6 +152,19 @@ fft:
 		lea ebx, [2 * ecx]
 		mov [edx + 8 * ebx], esi ; cur[2 * i]
 		mov [edx + 8 * ebx + 8], edi ; cur[2 * i + 1]
+						
+		push ecx
+		push esi
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
+		push ecx
+		push edi
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
 		
 		cmp ecx, 0
 		jnz cur_loop
