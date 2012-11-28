@@ -1,5 +1,10 @@
 extern calloc
 extern free
+extern printf
+
+section .data
+	format_int db "%d", 10, 0
+	format_double db "%f", 10, 0
 
 section .text
 
@@ -88,6 +93,12 @@ fft:
 		add esp, 4
 		
 		or [ebx], eax
+		
+		push ecx
+		push format_int
+		call printf
+		add esp, 8
+		
 		cmp ecx, [ebp + 12]
 		jb rev_loop
 
