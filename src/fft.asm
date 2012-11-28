@@ -77,7 +77,7 @@ fft:
 		xor eax, ecx
 				
 		mov edx, [ebp - 8]
-		lea ebx, [2 * ecx]
+		lea ebx, [ecx]
 		lea ebx, [edx + 4 * ebx]
 		mov [ebx], eax
 		
