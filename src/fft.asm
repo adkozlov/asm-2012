@@ -81,12 +81,14 @@ fft:
 		lea ebx, [edx + 4 * ebx]
 		mov [ebx], eax
 		
+		push eax
 		push ecx
-		push ebx
+		push dword [ebx]
 		push format_int
 		call printf
 		add esp, 8
-		pop ecx					
+		pop ecx	
+		pop eax				
 		
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 4]
@@ -97,9 +99,18 @@ fft:
 		push ecx
 		mov ecx, edx
 		shl eax, cl
-		pop ecx
+		pop ecx		
 		
 		or [ebx], eax
+		
+		push eax
+		push ecx
+		push dword [ebx]
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx	
+		pop eax
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
