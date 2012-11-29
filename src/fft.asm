@@ -202,7 +202,23 @@ fft:
 		pop ecx
 		
 		mov eax, dword [ebp + 12]
-		shr eax, cl		
+		shr eax, cl
+		
+		xor edx, edx
+		pdest_loop:
+			xor ebx, ebx
+			i_loop:
+				
+				
+				inc ebx
+				inc edx
+				cmp ebx, ecx
+				jb i_loop
+			
+			
+			add edx, ecx
+			cmp edx, [ebp + 12]
+			jb pdest_loop
 		
 		; free(ncur)
 		push ecx
