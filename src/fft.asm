@@ -215,3 +215,27 @@ fft:
 	mov esp, ebp
 	pop ebp
 	ret
+	
+global fft_rev	
+	
+; double* fft_rev(const double *in_data, const int size)
+fft_rev:
+	push ebp
+	mov ebp, esp
+	sub esp, 36 ; todo: local vars
+	push ebx
+	push esi
+	push edi
+
+	; double *cur = fft(in_data, size)
+	push dword [ebp + 12]
+	push dword [ebp + 8]
+	call fft
+	add esp, 8
+
+	pop edi
+	pop esi
+	pop ebx
+	mov esp, ebp
+	pop ebp
+	ret

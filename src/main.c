@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-//extern double *fft(const double *in_data, const int size);
-double *fft(const double *in_data, const int size)
+extern double *fft(const double *in_data, const int size);
+/*double *fft(const double *in_data, const int size)
 {
 	int i;
 	
@@ -73,7 +73,7 @@ double *fft(const double *in_data, const int size)
 	free(roots);
 	
 	return cur;
-}
+}*/
 
 extern double *fft_rev(const double *in_data, const int size);
 /*double *fft_rev(const double *in_data, const int size)
