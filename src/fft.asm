@@ -134,6 +134,22 @@ fft:
 	call calloc_double_2size
 	mov [ebp - 24], eax
 	
+	xor ecx, ecx
+	a_loop:
+		push ecx
+		
+		push edx, [ebp - 8]
+		push dword [edx + 4 * ecx]
+		push format_int
+		call printf
+		add esp, 8
+		
+		pop ecx
+		
+		inc ecx
+		cmp ecx, [ebp + 12]
+		jb a_loop
+	
 	; for (i = 0; i < size; ++i)
 	mov ecx, [ebp + 12]
 	cur_loop:
