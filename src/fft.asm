@@ -5,6 +5,7 @@ extern printf
 section .data
 	format_int db "%d", 10, 0
 	format_double db "%f", 10, 0
+	format_complex db "%f + %fi", 10, 0
 
 section .text
 
@@ -110,10 +111,8 @@ fft:
 	fidiv dword [ebp + 12]	
 
 	; for (i = 0; i < size; ++i)
-	mov ecx, [ebp + 12]
+	xor ecx, ecx
 	roots_loop:
-		dec	ecx
-
 		fld st0
 		push ecx
 		fimul dword [esp]
@@ -124,11 +123,11 @@ fft:
 		shl eax, 1
 		mov edx, [ebp - 20]
 		fstp qword [edx + 8 * eax]
-		inc eax
-		fstp qword [edx + 8 * eax]
+		fstp qword [edx + 8 * eax + 8]
 
-		cmp ecx, 0
-		jnz roots_loop
+		inc ecx
+		cmp ecx, [ebp + 12]
+		jb roots_loop
 
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
@@ -150,7 +149,14 @@ fft:
 		mov edx, [ebp - 24]
 		movsd [edx + 8 * ecx], xmm0
 		movsd [edx + 8 * ecx + 8], xmm1
-		shr ecx, 1					
+		shr ecx, 1
+		
+		push ecx
+		push ecx
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx					
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
@@ -178,7 +184,66 @@ fft:
 		p1_loop:
 			xor ebx, ebx
 			i_loop:
+				mov esi, eax
+				imul esi, ebx
+				shl esi, 1
 				
+				mov edi, [ebp - 20]
+				movsd xmm2, [edi + 8 * esi]
+				movsd xmm3, [edi + 8 * esi + 8]
+				
+				mov esi, edx
+				add esi, ecx
+				shl esi, 1
+				
+				mov edi, [ebp - 24]
+				movsd xmm4, [edi + 8 * esi]
+				movsd xmm5, [edi + 8 * esi + 8]
+				
+				movsd xmm6, xmm2
+				mulsd xmm6, xmm4
+				movsd xmm7, xmm1
+				mulsd xmm7, xmm5
+				movsd xmm0, xmm6
+				subsd xmm0, xmm7
+				
+				movsd xmm6, xmm2
+				mulsd xmm6, xmm5
+				movsd xmm7, xmm1
+				mulsd xmm7, xmm4
+				movsd xmm0, xmm6
+				subsd xmm0, xmm7
+			
+				mov esi, edx
+				shl esi, 1
+				
+				mov edi, [ebp - 24]
+				movsd xmm2, [edi + 8 * esi]
+				movsd xmm3, [edi + 8 * esi + 8]
+				
+				movsd xmm4, xmm2
+				addsd xmm4, xmm0
+				movsd xmm5, xmm3
+				addsd xmm5, xmm1
+				
+				mov edi, [ebp - 28]
+				movlpd [edi + 8 * esi], xmm4
+				movlpd [edi + 8 * esi + 8], xmm5
+				
+				movsd xmm4, xmm2
+				subsd xmm4, xmm0
+				movsd xmm5, xmm3
+				subsd xmm5, xmm1
+				
+				shl ecx, 1
+				add esi, ecx
+				
+				movlpd [edi + 8 * esi], xmm4
+				movlpd [edi + 8 * esi + 8], xmm5
+				
+				shr ecx, 1
+					
+								
 				inc ebx
 				inc edx
 				cmp ebx, ecx
@@ -188,18 +253,16 @@ fft:
 			add edx, ecx
 			cmp edx, [ebp + 12]
 			jb p1_loop
-			
-		mov edx, [ebp - 28]
-		xor [ebp - 24], edx ; double *tmp = ncur
-		xor edx, [ebp - 24] ; ncur = cur
-		xor [ebp - 24], edx ; cur = tmp
 		
 		; free(ncur)
 		push ecx
-		push dword [ebp - 28]
+		push dword [ebp - 24]
 		call free
 		add esp, 4
 		pop ecx
+		
+		mov edx, [ebp - 28]
+		mov [ebp - 24], edx
 		
 		shl ecx, 1
 		cmp ecx, [ebp + 12]
