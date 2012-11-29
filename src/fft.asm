@@ -75,11 +75,11 @@ fft:
 		shl eax, cl
 		pop ecx
 		xor eax, ecx
-				
+		
 		mov edx, [ebp - 8]
 		lea ebx, [2 * ecx]
 		lea ebx, [edx + 4 * ebx]
-		mov [ebx], eax
+		mov [ebx], eax			
 		
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 4]
@@ -90,30 +90,9 @@ fft:
 		push ecx
 		mov ecx, edx
 		shl eax, cl
-		pop ecx		
-		
-		push ecx
-		push dword [ebx]
-		push format_int
-		call printf
-		add esp, 8
 		pop ecx
 		
 		or [ebx], eax
-		
-		push ecx
-		push eax
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx
-		
-		push ecx
-		push dword [ebx]
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
@@ -208,7 +187,7 @@ fft:
 		pdest_loop:
 			xor ebx, ebx
 			i_loop:
-				
+						
 				
 				inc ebx
 				inc edx
