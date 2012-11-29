@@ -132,61 +132,29 @@ fft:
 
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
-	mov [ebp - 24], eax
-	
-	xor ecx, ecx
-	a_loop:
-		push ecx
-		
-		push edx, [ebp - 8]
-		push dword [edx + 4 * ecx]
-		push format_int
-		call printf
-		add esp, 8
-		
-		pop ecx
-		
-		inc ecx
-		cmp ecx, [ebp + 12]
-		jb a_loop
+	mov [ebp - 24], eax	
 	
 	; for (i = 0; i < size; ++i)
-	mov ecx, [ebp + 12]
+	xor ecx, ecx
 	cur_loop:
-		dec ecx
-		
 		; int ni = rev[i]
 		mov edx, [ebp - 8]
 		mov ebx, [edx + 4 * ecx]
-		shl ebx, 1
 		
-		push ecx
-		push ebx
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx
-		
-		lea eax, [2 * ecx]
-
+		shl ebx, 1		
 		mov edx, [ebp + 8]
-		mov esi, [edx + 8 * ebx]
-		mov edi, [edx + 8 * ebx + 4]
-		mov edx, [ebp - 24]
-		mov [edx + 8 * eax], esi
-		mov [edx + 8 * eax + 4], edi
-
-		inc ebx
-
-		mov edx, [ebp + 8]
-		mov esi, [edx + 8 * ebx]
-		mov edi, [edx + 8 * ebx + 4]
-		mov edx, [ebp - 24]
-		mov [edx + 8 * eax], esi
-		mov [edx + 8 * eax + 4], edi					
+		movsd xmm0, [edx + 8 * ebx]
+		movsd xmm1, [edx + 8 * ebx + 8]
 		
-		cmp ecx, 0
-		jnz cur_loop
+		shl ecx, 1
+		mov edx, [ebp - 24]
+		movsd [edx + 8 * ecx], xmm0
+		movsd [edx + 8 * ecx + 8], xmm1
+		shr ecx, 1					
+		
+		inc ecx
+		cmp ecx, [ebp + 12]
+		jb cur_loop
 
 	; free(rev)
 	push dword [ebp - 8]
@@ -220,7 +188,7 @@ fft:
 			
 			add edx, ecx
 			cmp edx, [ebp + 12]
-			jb pdest_loop
+			jb pdest_loop					
 		
 		; free(ncur)
 		push ecx
