@@ -175,10 +175,9 @@ fft:
 		shr eax, cl
 		
 		xor edx, edx
-		pdest_loop:
+		p1_loop:
 			xor ebx, ebx
 			i_loop:
-						
 				
 				inc ebx
 				inc edx
@@ -188,7 +187,12 @@ fft:
 			
 			add edx, ecx
 			cmp edx, [ebp + 12]
-			jb pdest_loop					
+			jb p1_loop
+			
+		mov edx, [ebp - 28]
+		xor [ebp - 24], edx ; double *tmp = ncur
+		xor edx, [ebp - 24] ; ncur = cur
+		xor [ebp - 24], edx ; cur = tmp
 		
 		; free(ncur)
 		push ecx
