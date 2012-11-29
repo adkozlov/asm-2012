@@ -77,19 +77,9 @@ fft:
 		xor eax, ecx
 		
 		mov edx, [ebp - 8]
-		lea ebx, [2 * ecx]
-		lea ebx, [edx + 4 * ebx]
-		mov [ebx], eax
-		
-		push eax
-		push ecx
-		push dword [ebx]
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx	
-		pop eax				
-		
+		mov ebx, [edx + 4 * eax]
+		mov dword [edx + 4 * ecx], ebx
+	
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 4]
 		sub edx, dword [ebp - 16]
@@ -101,16 +91,8 @@ fft:
 		shl eax, cl
 		pop ecx		
 		
-		or [ebx], eax
-		
-		push eax
-		push ecx
-		push dword [ebx]
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx	
-		pop eax
+		mov edx, [ebp - 8]
+		xor dword [edx + 4 * ecx], eax
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
@@ -158,9 +140,16 @@ fft:
 		dec ecx
 		
 		; int ni = rev[i]
-		mov ebx, [ebp - 8]
-		mov ebx, [ebx + 4 * ecx]
+		mov edx, [ebp - 8]
+		mov ebx, [edx + 4 * ecx]
 		shl ebx, 1
+		
+		push ecx
+		push ebx
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
 		
 		lea eax, [2 * ecx]
 
