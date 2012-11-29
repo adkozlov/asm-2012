@@ -25,6 +25,7 @@ calloc_double_2size:
 	ret
 
 global fft
+global fft_rev
 
 ; double* fft(const double *in_data, const int size)
 fft:
@@ -131,7 +132,7 @@ fft:
 
 	; double *cur = (double*) calloc(2 * size, sizeof(double));
 	call calloc_double_2size
-	mov [ebp - 24], eax	
+	mov [ebp - 24], eax
 	
 	; for (i = 0; i < size; ++i)
 	xor ecx, ecx
@@ -150,13 +151,6 @@ fft:
 		movsd [edx + 8 * ecx], xmm0
 		movsd [edx + 8 * ecx + 8], xmm1
 		shr ecx, 1
-		
-		push ecx
-		push ebx
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
@@ -178,71 +172,81 @@ fft:
 		pop ecx
 		
 		mov eax, dword [ebp + 12]
-		shr eax, cl
+		idiv eax, ecx
+		shr eax, 1
+		
+		push eax
+		push ecx
+		push eax
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
+		pop eax
 		
 		xor edx, edx
 		p1_loop:
 			xor ebx, ebx
 			i_loop:
-				mov esi, eax
-				imul esi, ebx
+				mov edi, [ebp - 20]
+				mov esi, ebx
+				imul esi, eax
 				shl esi, 1
 				
-				mov edi, [ebp - 20]
 				movsd xmm2, [edi + 8 * esi]
 				movsd xmm3, [edi + 8 * esi + 8]
 				
+				mov edi, [ebp - 24]
 				mov esi, edx
 				add esi, ecx
 				shl esi, 1
 				
-				mov edi, [ebp - 24]
 				movsd xmm4, [edi + 8 * esi]
 				movsd xmm5, [edi + 8 * esi + 8]
 				
 				movsd xmm6, xmm2
 				mulsd xmm6, xmm4
-				movsd xmm7, xmm1
+				movsd xmm7, xmm3
 				mulsd xmm7, xmm5
+				
 				movsd xmm0, xmm6
 				subsd xmm0, xmm7
 				
 				movsd xmm6, xmm2
 				mulsd xmm6, xmm5
-				movsd xmm7, xmm1
+				movsd xmm7, xmm3
 				mulsd xmm7, xmm4
-				movsd xmm0, xmm6
-				subsd xmm0, xmm7
-			
+				
+				movsd xmm1, xmm6
+				addsd xmm1, xmm7
+				
+				mov edi, [ebp - 24]
 				mov esi, edx
 				shl esi, 1
 				
-				mov edi, [ebp - 24]
 				movsd xmm2, [edi + 8 * esi]
 				movsd xmm3, [edi + 8 * esi + 8]
 				
+				mov edi, [ebp - 28]
 				movsd xmm4, xmm2
 				addsd xmm4, xmm0
 				movsd xmm5, xmm3
 				addsd xmm5, xmm1
 				
-				mov edi, [ebp - 28]
 				movlpd [edi + 8 * esi], xmm4
 				movlpd [edi + 8 * esi + 8], xmm5
 				
-				movsd xmm4, xmm2
-				subsd xmm4, xmm0
-				movsd xmm5, xmm3
-				subsd xmm5, xmm1
-				
-				shl ecx, 1
+				shr esi, 1
 				add esi, ecx
+				shl esi, 1
 				
-				movlpd [edi + 8 * esi], xmm4
-				movlpd [edi + 8 * esi + 8], xmm5
+				movsd xmm6, xmm2
+				subsd xmm6, xmm0
+				movsd xmm7, xmm3
+				subsd xmm7, xmm1
 				
-				shr ecx, 1
-					
+				movlpd [edi + 8 * esi], xmm6
+				movlpd [edi + 8 * esi + 8], xmm7
 								
 				inc ebx
 				inc edx
@@ -281,9 +285,7 @@ fft:
 	pop ebx
 	mov esp, ebp
 	pop ebp
-	ret
-	
-global fft_rev	
+	ret	
 	
 ; double* fft_rev(const double *in_data, const int size)
 fft_rev:
