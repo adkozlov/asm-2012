@@ -222,7 +222,7 @@ global fft_rev
 fft_rev:
 	push ebp
 	mov ebp, esp
-	sub esp, 36 ; todo: local vars
+	sub esp, 4
 	push ebx
 	push esi
 	push edi
@@ -231,7 +231,51 @@ fft_rev:
 	push dword [ebp + 12]
 	push dword [ebp + 8]
 	call fft
-	add esp, 8
+	add esp, 8	
+	mov [ebp - 4], eax
+	
+	cvtsi2sd xmm0, [ebp + 12]
+	
+	xor ecx, ecx
+	size_loop: ; for (i = 0; i < 2 * size; ++i)
+		mov edx, [ebp - 4]
+		movsd xmm1, [edx + 8 * ecx]
+		divsd xmm1, xmm0
+		movsd [edx + 8 * ecx], xmm1
+		
+		mov edx, dword [ebp + 12]
+		shl edx, 1
+		
+		inc ecx
+		cmp ecx, edx
+		jb size_loop
+	
+	mov ecx, 2
+	reverse_loop: ; for (i = 1; i < size / 2; ++i)
+		mov edx, [ebp - 4]
+		movsd xmm0, [edx + 8 * ecx]
+		movsd xmm1, [edx + 8 * ecx + 8]
+		
+		; int i_rev = size - i
+		mov ebx, [ebp + 12]
+		shl ebx, 1
+		sub ebx, ecx
+		
+		movsd xmm2, [edx + 8 * ebx]
+		movsd xmm3, [edx + 8 * ebx + 8]
+
+		movsd [edx + 8 * ebx], xmm0
+		movsd [edx + 8 * ecx + 8], xmm1
+		movsd [edx + 8 * ecx], xmm2
+		movsd [edx + 8 * ecx + 8], xmm3
+
+		add ecx, 2
+		cmp ecx, dword [ebp + 12]
+		jb reverse_loop
+		
+	
+	; return cur;
+	mov eax, [ebp - 4]	
 
 	pop edi
 	pop esi
