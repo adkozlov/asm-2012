@@ -77,7 +77,7 @@ fft:
 		xor eax, ecx
 				
 		mov edx, [ebp - 8]
-		lea ebx, [ecx]
+		lea ebx, [2 * ecx]
 		lea ebx, [edx + 4 * ebx]
 		mov [ebx], eax
 		
@@ -91,6 +91,13 @@ fft:
 		mov ecx, edx
 		shl eax, cl
 		pop ecx		
+		
+		push ecx
+		push dword [ebx]
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx
 		
 		or [ebx], eax
 		
@@ -166,14 +173,6 @@ fft:
 		mov edx, [ebp - 24]
 		mov [edx + 8 * eax], esi
 		mov [edx + 8 * eax + 4], edi
-		
-		push ecx
-		push dword [edx + 8 * eax + 4]
-		push dword [edx + 8 * eax]
-		push format_double
-		call printf
-		add esp, 12
-		pop ecx
 
 		inc ebx
 
@@ -182,15 +181,7 @@ fft:
 		mov edi, [edx + 8 * ebx + 4]
 		mov edx, [ebp - 24]
 		mov [edx + 8 * eax], esi
-		mov [edx + 8 * eax + 4], edi
-		
-		push ecx
-		push dword [edx + 8 * ebx + 4]
-		push dword [edx + 8 * ebx]
-		push format_double
-		call printf
-		add esp, 12
-		pop ecx						
+		mov [edx + 8 * eax + 4], edi					
 		
 		cmp ecx, 0
 		jnz cur_loop
@@ -205,13 +196,20 @@ fft:
 	inc ecx
 	len_loop:
 		; double *ncur = (double*) calloc(2 * size, sizeof(double))
+		push ecx
 		call calloc_double_2size
 		mov [ebp - 28], eax
+		pop ecx
+		
+		mov eax, dword [ebp + 12]
+		shr eax, cl		
 		
 		; free(ncur)
+		push ecx
 		push dword [ebp - 28]
 		call free
 		add esp, 4
+		pop ecx
 		
 		shl ecx, 1
 		cmp ecx, [ebp + 12]
