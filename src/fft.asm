@@ -1,11 +1,5 @@
 extern calloc
 extern free
-extern printf
-
-section .data
-	format_int db "%d", 10, 0
-	format_double db "%f", 10, 0
-	format_complex db "%f + %fi", 10, 0
 
 section .text
 
@@ -174,15 +168,6 @@ fft:
 		mov eax, dword [ebp + 12]
 		idiv eax, ecx
 		shr eax, 1
-		
-		push eax
-		push ecx
-		push eax
-		push format_int
-		call printf
-		add esp, 8
-		pop ecx
-		pop eax
 		
 		xor edx, edx
 		p1_loop:
