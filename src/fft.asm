@@ -152,11 +152,11 @@ fft:
 		shr ecx, 1
 		
 		push ecx
-		push ecx
+		push ebx
 		push format_int
 		call printf
 		add esp, 8
-		pop ecx					
+		pop ecx
 		
 		inc ecx
 		cmp ecx, [ebp + 12]
