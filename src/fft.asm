@@ -79,7 +79,14 @@ fft:
 		mov edx, [ebp - 8]
 		lea ebx, [2 * ecx]
 		lea ebx, [edx + 4 * ebx]
-		mov [ebx], eax			
+		mov [ebx], eax
+		
+		push ecx
+		push ebx
+		push format_int
+		call printf
+		add esp, 8
+		pop ecx					
 		
 		; 1 << (k - high1 - 1)
 		mov edx, dword [ebp - 4]
